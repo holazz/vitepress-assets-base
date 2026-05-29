@@ -1,0 +1,50 @@
+{
+  "name": "vitepress-assets-base",
+  "type": "module",
+  "version": "0.0.0",
+  "packageManager": "pnpm@10.33.0",
+  "description": "Separate VitePress page base from static assets base.",
+  "sideEffects": false,
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.mjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.mts",
+  "files": [
+    "README.md",
+    "README.zh-CN.md",
+    "dist"
+  ],
+  "engines": {
+    "node": ">=20.19.0"
+  },
+  "scripts": {
+    "build": "tsdown",
+    "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
+    "typecheck": "tsc --noEmit",
+    "release": "bumpp",
+    "prepack": "pnpm build",
+    "prepare": "simple-git-hooks"
+  },
+  "peerDependencies": {
+    "vitepress": ">=2.0.0-alpha.17 <3.0.0"
+  },
+  "devDependencies": {
+    "@antfu/eslint-config": "^4.19.0",
+    "bumpp": "^10.2.3",
+    "eslint": "^9.39.4",
+    "jiti": "^2.6.1",
+    "simple-git-hooks": "^2.13.1",
+    "tsdown": "^0.16.8",
+    "typescript": "^5.8.3",
+    "vitepress": "2.0.0-alpha.17"
+  },
+  "simple-git-hooks": {
+    "pre-commit": "pnpm lint:fix && pnpm typecheck"
+  }
+}
