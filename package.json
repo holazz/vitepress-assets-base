@@ -48,7 +48,6 @@
     "@antfu/eslint-config": "^4.19.0",
     "bumpp": "^10.2.3",
     "eslint": "^9.39.4",
-    "jiti": "^2.6.1",
     "simple-git-hooks": "^2.13.1",
     "tsdown": "^0.16.8",
     "typescript": "^5.8.3",
