@@ -4,7 +4,16 @@
   "version": "0.0.1",
   "packageManager": "pnpm@10.33.0",
   "description": "Separate VitePress page base from static assets base.",
+  "author": "holazz",
   "license": "MIT",
+  "homepage": "https://github.com/holazz/vitepress-assets-base#readme",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/holazz/vitepress-assets-base.git"
+  },
+  "bugs": {
+    "url": "https://github.com/holazz/vitepress-assets-base/issues"
+  },
   "sideEffects": false,
   "exports": {
     ".": {
