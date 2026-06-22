@@ -1,5 +1,6 @@
 import type { DefaultTheme } from 'vitepress/theme'
 import type {
+  BuildEnd,
   TransformHtml,
   VitePressAssetsBaseConfig,
   VitePressAssetsBaseOptions,
@@ -7,6 +8,7 @@ import type {
 } from './types'
 import { normalizeAssetsBase } from './assets-url'
 import { callTransformHtml, rewriteHtmlAssetUrls } from './html'
+import { mirrorHtmlToBase } from './html-output'
 import { createRenderBuiltUrl } from './render-built-url'
 import { createVitePressRuntimeAssetsBasePlugin } from './runtime-plugin'
 import { rewriteThemeConfigAssets } from './theme'
@@ -23,15 +25,25 @@ export function withVitePressAssetsBase(config: VitePressAssetsBaseOptions): unk
   const { assetsBase: rawAssetsBase, ...vitePressConfig } = sourceConfig
   const assetsBase = normalizeAssetsBase(rawAssetsBase ?? '')
   const pageBase = typeof sourceConfig.base === 'string' ? sourceConfig.base : '/'
-  if (!assetsBase) {
-    return vitePressConfig
-  }
-
+  const originalBuildEnd = sourceConfig.buildEnd
   const originalTransformHtml = sourceConfig.transformHtml
   const originalRenderBuiltUrl = sourceConfig.vite?.experimental?.renderBuiltUrl
 
-  return {
+  const baseConfig = {
     ...vitePressConfig,
+    buildEnd: async (...args: Parameters<BuildEnd>): Promise<void> => {
+      const [siteConfig] = args
+      await originalBuildEnd?.(...args)
+      await mirrorHtmlToBase(siteConfig.outDir, pageBase)
+    },
+  }
+
+  if (!assetsBase) {
+    return baseConfig
+  }
+
+  return {
+    ...baseConfig,
     themeConfig: rewriteThemeConfigAssets(sourceConfig.themeConfig, assetsBase),
     // Runs the original hook first, then rewrites any root-relative asset URLs it returns.
     // 先执行原始钩子，再改写它返回内容中的根路径静态资源 URL。

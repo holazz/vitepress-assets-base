@@ -69,6 +69,6 @@ export function isRootAssetPath(path: string): boolean {
  * Checks whether a path is already an absolute external URL.
  * 判断路径是否已经是绝对外部 URL。
  */
-function isExternalUrl(path: string): boolean {
+export function isExternalUrl(path: string): boolean {
   return /^[a-z][a-z\d+\-.]*:/i.test(path) || path.startsWith('//')
 }

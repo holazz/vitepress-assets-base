@@ -12,6 +12,7 @@ export interface VitePressAssetsBaseRuntimeConfig extends VitePressAssetsBaseOpt
   [key: string]: unknown
   base?: string
   themeConfig?: unknown
+  buildEnd?: BuildEnd
   transformHtml?: TransformHtml
   vite?: {
     experimental?: {
@@ -30,6 +31,12 @@ export interface TransformContext {
    */
   error: (message: string) => never
 }
+
+/**
+ * Matches VitePress buildEnd hooks.
+ * 匹配 VitePress buildEnd 钩子。
+ */
+export type BuildEnd = (siteConfig: { outDir: string, [key: string]: unknown }) => void | Promise<void>
 
 /**
  * Matches VitePress transformHtml hooks that can return rewritten HTML.
