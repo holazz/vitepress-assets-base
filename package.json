@@ -1,7 +1,7 @@
 {
   "name": "vitepress-assets-base",
   "type": "module",
-  "version": "1.0.1",
+  "version": "0.0.4",
   "packageManager": "pnpm@10.33.0",
   "description": "Separate VitePress page base from static assets base.",
   "author": "holazz",
