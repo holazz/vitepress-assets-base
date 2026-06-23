@@ -57,7 +57,10 @@ export function withVitePressAssetsBase(config: VitePressAssetsBaseOptions): unk
         ...sourceConfig.vite?.experimental,
         renderBuiltUrl: createRenderBuiltUrl(assetsBase, originalRenderBuiltUrl),
       },
-      plugins: [createVitePressRuntimeAssetsBasePlugin(assetsBase), ...(sourceConfig.vite?.plugins ?? [])],
+      plugins: [
+        createVitePressRuntimeAssetsBasePlugin(assetsBase, { spaFallback }),
+        ...(sourceConfig.vite?.plugins ?? []),
+      ],
     },
   }
 }

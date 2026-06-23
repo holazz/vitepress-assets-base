@@ -1,11 +1,18 @@
 import type { TransformContext } from './types'
 import { withAssetsBase } from './assets-url'
 
+interface VitePressRuntimeAssetsBasePluginOptions {
+  spaFallback?: boolean
+}
+
 /**
  * Creates a Vite plugin that rewrites VitePress runtime asset lookups.
  * 创建 Vite 插件，用于改写 VitePress 运行时的静态资源查找逻辑。
  */
-export function createVitePressRuntimeAssetsBasePlugin(assetsBase: string) {
+export function createVitePressRuntimeAssetsBasePlugin(
+  assetsBase: string,
+  options: VitePressRuntimeAssetsBasePluginOptions = {},
+) {
   const { pageChunkPath, assetsPageChunkPath } = createPageChunkReplacements()
 
   return {
@@ -15,6 +22,16 @@ export function createVitePressRuntimeAssetsBasePlugin(assetsBase: string) {
     // 在常规 Vite 转换流程前改写指定的 VitePress 客户端模块。
     transform(this: TransformContext, code: string, id: string): string | undefined {
       const normalizedId = id.replace(/\\/g, '/')
+
+      if (options.spaFallback && normalizedId.includes('/vitepress/dist/client/app/index.js')) {
+        return replaceOrReport(
+          this,
+          code,
+          'if (isInitialPageLoad) {\n                pageFilePath = pageFilePath.replace(/\\.js$/, \'.lean.js\');\n            }',
+          'if (isInitialPageLoad && document.querySelector(\'#app\')?.hasChildNodes()) {\n                pageFilePath = pageFilePath.replace(/\\.js$/, \'.lean.js\');\n            }',
+          'failed to disable lean page chunks for empty spa fallback shell',
+        )
+      }
 
       if (normalizedId.includes('/vitepress/dist/client/app/utils.js')) {
         let next = code
