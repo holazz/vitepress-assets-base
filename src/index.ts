@@ -1,4 +1,3 @@
-import type { DefaultTheme } from 'vitepress/theme'
 import type {
   BuildEnd,
   TransformHtml,
@@ -8,21 +7,19 @@ import type {
 } from './types'
 import { normalizeAssetsBase } from './assets-url'
 import { callTransformHtml, rewriteHtmlAssetUrls } from './html'
-import { mirrorHtmlToBase } from './html-output'
 import { createRenderBuiltUrl } from './render-built-url'
 import { createVitePressRuntimeAssetsBasePlugin } from './runtime-plugin'
+import { createSpaFallbackShell } from './spa-fallback'
 import { rewriteThemeConfigAssets } from './theme'
 
 /**
  * Wraps a VitePress config so generated assets can be served from a separate base URL.
  * 包装 VitePress 配置，让生成的静态资源可以从独立的基础路径加载。
  */
-export function withVitePressAssetsBase<ThemeConfig = DefaultTheme.Config>(
-  config: VitePressAssetsBaseConfig<NoInfer<ThemeConfig>>,
-): any
+export function withVitePressAssetsBase(config: VitePressAssetsBaseConfig): any
 export function withVitePressAssetsBase(config: VitePressAssetsBaseOptions): unknown {
   const sourceConfig = config as VitePressAssetsBaseRuntimeConfig
-  const { assetsBase: rawAssetsBase, ...vitePressConfig } = sourceConfig
+  const { assetsBase: rawAssetsBase, spaFallback = false, ...vitePressConfig } = sourceConfig
   const assetsBase = normalizeAssetsBase(rawAssetsBase ?? '')
   const pageBase = typeof sourceConfig.base === 'string' ? sourceConfig.base : '/'
   const originalBuildEnd = sourceConfig.buildEnd
@@ -34,7 +31,9 @@ export function withVitePressAssetsBase(config: VitePressAssetsBaseOptions): unk
     buildEnd: async (...args: Parameters<BuildEnd>): Promise<void> => {
       const [siteConfig] = args
       await originalBuildEnd?.(...args)
-      await mirrorHtmlToBase(siteConfig.outDir, pageBase)
+      if (spaFallback) {
+        await createSpaFallbackShell(siteConfig.outDir)
+      }
     },
   }
 
