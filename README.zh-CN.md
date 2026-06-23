@@ -13,6 +13,7 @@ import { withVitePressAssetsBase } from 'vitepress-assets-base'
 export default defineConfig(withVitePressAssetsBase({
   base: '/',
   assetsBase: '/static/site/',
+  spaFallback: true,
 }))
 ```
 
@@ -24,15 +25,25 @@ export default defineConfig(withVitePressAssetsBase({
 /static/site/hashmap.json
 ```
 
+开启 `spaFallback` 后，插件会把生成的 `index.html` 转成空的 SPA fallback shell：
+
+```html
+<div id="app"></div>
+```
+
+这适用于 nginx 等服务端固定把刷新请求 fallback 到站点入口 `index.html` 的部署模型。否则刷新深层路由时，浏览器可能拿到首页 SSR HTML，再按当前路由 hydrate，导致 hydration mismatch。
+
 ## 配置项
 
 ```ts
 interface VitePressAssetsBaseConfig {
   assetsBase?: string
+  spaFallback?: boolean
 }
 ```
 
 - `assetsBase`：静态资源基础路径。为空时不做任何改写。
+- `spaFallback`：是否把 `outDir/index.html` 转成空的 SPA fallback shell，默认 `false`。
 
 ## 改写范围
 
@@ -42,3 +53,15 @@ interface VitePressAssetsBaseConfig {
 - Vite 构建资源：通过 `experimental.renderBuiltUrl` 改写客户端资源路径。
 - VitePress 运行时：改写页面 chunk 加载路径和 `hashmap.json` fallback 请求路径。
 - 主题配置：改写 `themeConfig.logo`。
+
+如果开启 `spaFallback`，还会在 VitePress 构建结束后只改写 `outDir/index.html`。其他页面的 SSG HTML 产物保持不变。
+
+## 什么时候使用 `spaFallback`
+
+当服务端把所有深层路由刷新都指向同一个 fallback `index.html` 时，开启 `spaFallback`，例如：
+
+```nginx
+try_files $uri $uri/ /index.html;
+```
+
+如果服务端可以直接返回每个 VitePress 生成的页面 HTML，例如 `/components/button/index.html`，则保持关闭。
