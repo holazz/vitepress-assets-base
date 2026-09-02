@@ -41,7 +41,7 @@ export interface VitePressAssetsBaseViteConfig {
   }
   plugins?: VitePressAssetsBaseVitePlugin[]
   resolve?: {
-    alias?: VitePressAssetsBaseAlias[]
+    alias?: VitePressAssetsBaseAlias | VitePressAssetsBaseAlias[]
     [key: string]: unknown
   }
   server?: {
